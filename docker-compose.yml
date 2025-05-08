@@ -1,9 +1,0 @@
-version: '3'
-
-services:
-  recommender:
-    build: .
-    volumes:
-      - ./:/app
-    environment:
-      - TF_FORCE_GPU_ALLOW_GROWTH=true
