@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const userId = searchParams.get('userId') || 'user_0';
     const topK = parseInt(searchParams.get('topK') || '10');
 
-    // Try to call the Python backend first
+
     try {
       const pythonResponse = await fetch('http://localhost:5000/recommend', {
         method: 'POST',
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       console.log('Python backend not available, using fallback algorithm');
     }
 
-    // Fallback: Simple recommendation algorithm
+
     const csvPath = path.join(process.cwd(), '..', 'courses.csv');
     const csvContent = fs.readFileSync(csvPath, 'utf-8');
     
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
       skip_empty_lines: true
     });
 
-    // Simple recommendation: return top courses by subscribers
+
     const recommendations = records
       .sort((a: any, b: any) => parseInt(b.num_subscribers) - parseInt(a.num_subscribers))
       .slice(0, topK)

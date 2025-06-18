@@ -61,14 +61,14 @@ export default function CourseCard({ course }: CourseCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Course Image Placeholder */}
+
       <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
         <BookOpen className="h-16 w-16 text-white opacity-80" />
       </div>
 
-      {/* Course Content */}
+
       <div className="p-4">
-        {/* Subject and Level */}
+
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
             {course.subject}
@@ -78,12 +78,11 @@ export default function CourseCard({ course }: CourseCardProps) {
           </span>
         </div>
 
-        {/* Course Title */}
+
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">
           {course.course_title}
         </h3>
 
-        {/* Stats */}
         <div className="flex items-center justify-between mb-3 text-sm text-gray-600">
           <div className="flex items-center">
             <Users className="h-4 w-4 mr-1" />
@@ -99,7 +98,6 @@ export default function CourseCard({ course }: CourseCardProps) {
           </div>
         </div>
 
-        {/* Price and Action */}
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <DollarSign className="h-4 w-4 text-green-600 mr-1" />

@@ -34,7 +34,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
       const data = await response.json();
       setCourse(data.course);
       
-      // Fetch similar courses (for now, just get courses from same subject)
+
       const allCoursesResponse = await fetch('/api/courses');
       const allCoursesData = await allCoursesResponse.json();
       const similar = allCoursesData.courses
@@ -105,7 +105,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
@@ -122,9 +122,9 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
+
           <div className="lg:col-span-2">
-            {/* Course Header */}
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -150,7 +150,6 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                 </div>
               </div>
 
-              {/* Course Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-t border-gray-200">
                 <div className="text-center">
                   <div className="flex items-center justify-center mb-1">
@@ -190,7 +189,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                 </div>
               </div>
 
-              {/* Action Buttons */}
+
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                 <button className="flex-1 flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
                   <Play className="h-5 w-5 mr-2" />
@@ -202,7 +201,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
               </div>
             </div>
 
-            {/* Similar Courses */}
+
             {similarCourses.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Similar Courses</h2>
@@ -227,7 +226,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             )}
           </div>
 
-          {/* Sidebar */}
+
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Information</h3>

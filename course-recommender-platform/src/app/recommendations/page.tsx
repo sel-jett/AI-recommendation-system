@@ -54,7 +54,7 @@ export default function RecommendationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -96,7 +96,7 @@ export default function RecommendationsPage() {
         </div>
       </div>
 
-      {/* Content */}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">

@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)
 
 class SimpleCourseRecommenderAPI:
     def __init__(self, courses_file="courses.csv"):
@@ -61,28 +61,28 @@ class SimpleCourseRecommenderAPI:
         """Simple recommendation based on user's preferred subjects and course popularity"""
         if user_id not in self.unique_user_ids:
             print(f"User {user_id} not found")
-            # Return popular courses as fallback
+
             return self.courses.sort_values('num_subscribers', ascending=False).head(top_k)[
                 ['course_id', 'course_title', 'subject', 'level', 'price', 'num_subscribers', 'num_reviews', 'num_lectures', 'content_duration']
             ]
         
-        # Get user's preferred subjects from their interactions
+
         user_interactions = self.ratings[self.ratings['user_id'] == user_id]
         if len(user_interactions) == 0:
-            # Return popular courses as fallback
+
             return self.courses.sort_values('num_subscribers', ascending=False).head(top_k)[
                 ['course_id', 'course_title', 'subject', 'level', 'price', 'num_subscribers', 'num_reviews', 'num_lectures', 'content_duration']
             ]
         
-        # Get user's preferred subjects
+
         preferred_subjects = user_interactions['subject'].unique()
         
-        # Get courses from preferred subjects, sorted by popularity
+
         recommended_courses = self.courses[
             self.courses['subject'].isin(preferred_subjects)
         ].sort_values('num_subscribers', ascending=False)
         
-        # If not enough courses from preferred subjects, add popular courses from other subjects
+
         if len(recommended_courses) < top_k:
             other_courses = self.courses[
                 ~self.courses['subject'].isin(preferred_subjects)
@@ -94,7 +94,7 @@ class SimpleCourseRecommenderAPI:
             ['course_id', 'course_title', 'subject', 'level', 'price', 'num_subscribers', 'num_reviews', 'num_lectures', 'content_duration']
         ]
 
-# Initialize the recommender system
+
 recommender = SimpleCourseRecommenderAPI()
 
 @app.route('/health', methods=['GET'])
@@ -116,7 +116,7 @@ def get_recommendations():
                 "message": f"No recommendations found for user {user_id}"
             })
         
-        # Convert to list of dictionaries
+
         recommendations_list = recommendations.to_dict('records')
         
         return jsonify({

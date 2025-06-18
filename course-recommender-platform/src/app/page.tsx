@@ -95,7 +95,7 @@ export default function Home() {
         
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto">
-            {/* Search and Stats */}
+
             <div className="mb-8">
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <div className="flex-1 relative">
@@ -157,7 +157,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Course Grid */}
+
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 {searchTerm || selectedSubject || selectedLevel ? 'Filtered Courses' : 'All Courses'}
