@@ -3,11 +3,16 @@ import fs from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Course ID is required' },
+        { status: 400 }
+      );
+    }
     const csvPath = path.join(process.cwd(), '..', 'courses.csv');
     const csvContent = fs.readFileSync(csvPath, 'utf-8');
     
@@ -16,7 +21,7 @@ export async function GET(
       skip_empty_lines: true
     });
 
-    const course = records.find((course: any) => course.course_id === params.id);
+    const course = records.find((course: any) => course.course_id === id);
 
     if (!course) {
       return NextResponse.json(

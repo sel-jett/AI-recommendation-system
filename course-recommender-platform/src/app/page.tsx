@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, BookOpen, Star, Users, DollarSign, Filter } from 'lucide-react';
+import { Search, BookOpen, Star, Users, DollarSign, Filter, Eye } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
+import { useSession } from 'next-auth/react';
 
 interface Course {
   course_id: string;
@@ -25,7 +26,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
-  const [currentUser, setCurrentUser] = useState('user_0');
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetchCourses();
@@ -81,7 +82,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header currentUser={currentUser} onUserChange={setCurrentUser} />
+      <Header />
       
       <div className="flex">
         <Sidebar
@@ -157,7 +158,6 @@ export default function Home() {
               </div>
             </div>
 
-
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 {searchTerm || selectedSubject || selectedLevel ? 'Filtered Courses' : 'All Courses'}
@@ -165,6 +165,33 @@ export default function Home() {
                   ({filteredCourses.length} courses)
                 </span>
               </h2>
+              {session && (
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start">
+                    <Eye className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
+                    <div>
+                      <h3 className="text-sm font-medium text-blue-900 mb-1">
+                        Dynamic Recommendations Active
+                      </h3>
+                      <p className="text-sm text-blue-700 mb-2">
+                        Welcome back, {session.user?.name || session.user?.email}! 
+                        Your recommendations update every time you view a course.
+                      </p>
+                      <div className="flex items-center space-x-4">
+                        <a 
+                          href="/recommendations" 
+                          className="text-blue-800 font-medium hover:underline text-sm"
+                        >
+                          View your personalized recommendations →
+                        </a>
+                        <span className="text-xs text-blue-600">
+                          💡 Click on any course to improve your recommendations
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

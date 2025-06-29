@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Star, Users, Clock, DollarSign, BookOpen, Play } from 'lucide-react';
+import { ArrowLeft, Star, Users, Clock, DollarSign, BookOpen, Play, Eye } from 'lucide-react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 interface Course {
   course_id: string;
@@ -18,14 +19,24 @@ interface Course {
   is_paid: string;
 }
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
+export default function Page({ params }: { params: { id: string } }) {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [similarCourses, setSimilarCourses] = useState<Course[]>([]);
+  const [viewTracked, setViewTracked] = useState(false);
+  const [showRecommendationUpdate, setShowRecommendationUpdate] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetchCourse();
   }, [params.id]);
+
+  // Separate useEffect for tracking course views when both course and session are available
+  useEffect(() => {
+    if (course && session?.user?.id && !viewTracked) {
+      trackCourseView();
+    }
+  }, [course, session, viewTracked]);
 
   const fetchCourse = async () => {
     setLoading(true);
@@ -33,7 +44,6 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
       const response = await fetch(`/api/courses/${params.id}`);
       const data = await response.json();
       setCourse(data.course);
-      
 
       const allCoursesResponse = await fetch('/api/courses');
       const allCoursesData = await allCoursesResponse.json();
@@ -45,6 +55,36 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
       console.error('Error fetching course:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const trackCourseView = async () => {
+    if (!session?.user?.id || viewTracked || !course) return;
+    
+    try {
+      console.log(`Tracking view for course: ${course.course_id}`);
+      const response = await fetch(`/api/courses/${params.id}/view`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        setViewTracked(true);
+        setShowRecommendationUpdate(true);
+        
+        // Hide the notification after 5 seconds
+        setTimeout(() => {
+          setShowRecommendationUpdate(false);
+        }, 5000);
+        
+        console.log('Course view tracked successfully');
+      } else {
+        console.error('Failed to track course view:', response.status);
+      }
+    } catch (error) {
+      console.error('Error tracking course view:', error);
     }
   };
 
@@ -105,6 +145,15 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Recommendation Update Notification */}
+      {showRecommendationUpdate && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-in slide-in-from-right">
+          <div className="flex items-center">
+            <Eye className="h-5 w-5 mr-2" />
+            <span>Your recommendations have been updated!</span>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -189,7 +238,6 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                 </div>
               </div>
 
-
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                 <button className="flex-1 flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
                   <Play className="h-5 w-5 mr-2" />
@@ -201,6 +249,24 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
               </div>
             </div>
 
+            {session && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center">
+                  <Eye className="h-5 w-5 text-blue-600 mr-2" />
+                  <div>
+                    <h3 className="text-sm font-medium text-blue-900">
+                      Course View Tracked
+                    </h3>
+                    <p className="text-sm text-blue-700">
+                      Your recommendations will be updated based on this course. 
+                      <Link href="/recommendations" className="text-blue-800 font-medium hover:underline ml-1">
+                        View updated recommendations →
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {similarCourses.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -212,12 +278,14 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                       href={`/course/${similarCourse.course_id}`}
                       className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all"
                     >
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                      <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">
                         {similarCourse.course_title}
                       </h3>
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>{formatPrice(similarCourse.price)}</span>
-                        <span>{formatSubscribers(similarCourse.num_subscribers)} students</span>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>{similarCourse.subject}</span>
+                        <span className="font-medium text-green-600">
+                          {formatPrice(similarCourse.price)}
+                        </span>
                       </div>
                     </Link>
                   ))}
@@ -226,37 +294,33 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             )}
           </div>
 
-
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Information</h3>
-              
-              <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Course Information</h3>
+              <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Subject</label>
-                  <p className="text-gray-900">{course.subject}</p>
+                  <span className="text-sm font-medium text-gray-500">Subject</span>
+                  <p className="text-sm text-gray-900">{course.subject}</p>
                 </div>
-                
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Level</label>
-                  <p className="text-gray-900">{course.level}</p>
+                  <span className="text-sm font-medium text-gray-500">Level</span>
+                  <p className="text-sm text-gray-900">{course.level}</p>
                 </div>
-                
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Published</label>
-                  <p className="text-gray-900">
-                    {new Date(course.published_timestamp).toLocaleDateString()}
-                  </p>
+                  <span className="text-sm font-medium text-gray-500">Price</span>
+                  <p className="text-sm text-gray-900">{formatPrice(course.price)}</p>
                 </div>
-                
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Content Duration</label>
-                  <p className="text-gray-900">{course.content_duration}</p>
+                  <span className="text-sm font-medium text-gray-500">Duration</span>
+                  <p className="text-sm text-gray-900">{course.content_duration}</p>
                 </div>
-                
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Number of Lectures</label>
-                  <p className="text-gray-900">{course.num_lectures}</p>
+                  <span className="text-sm font-medium text-gray-500">Lectures</span>
+                  <p className="text-sm text-gray-900">{course.num_lectures}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-500">Students</span>
+                  <p className="text-sm text-gray-900">{formatSubscribers(course.num_subscribers)}</p>
                 </div>
               </div>
             </div>
